@@ -63,19 +63,7 @@ const sublevels = [
     skill: 'Multi-condition WHERE + IN()',
     checks: ['from', 'employees', 'where', 'department', 'security', 'floor', '1', 'clearance'],
   },
-  {
-    id: 'BONUS',
-    title: 'The Full Picture',
-    briefing:
-      'Reconstruct the full sequence to prepare the next case file with evidence-backed timeline.',
-    mission:
-      'Retrieve access logs after 22:00 for employee IDs 1, 6, and 9 ordered by timestamp.',
-    passCondition: 'Returns 5 rows in chronological order of that night.',
-    reveal:
-      'Timeline confirms coordinated movement. Case File 01 closes with clear suspects identified.',
-    skill: 'IN() + date filter + ORDER BY',
-    checks: ['from', 'access_logs', 'where', 'employee_id', 'in', 'order by', 'timestamp'],
-  },
+  
 ]
 
 const employeesFields = [
@@ -97,6 +85,7 @@ function Level1() {
   const [sqlInput, setSqlInput] = useState('')
   const [maxUnlocked, setMaxUnlocked] = useState(1)
   const [message, setMessage] = useState('')
+  const [queryOutput, setQueryOutput] = useState([])
   const [tablePositions, setTablePositions] = useState({
     employees: { x: 60, y: 34 },
     accessLogs: { x: 500, y: 180 },
@@ -115,7 +104,7 @@ function Level1() {
     return 'locked'
   }
 
-  const normalize = (text) => text.toLowerCase().replace(/\s+/g, ' ').trim()
+  const normalize = (text) => text.replace(/\s+/g, ' ').trim()
 
   const updateTablePosition = (tableId, position) => {
     setTablePositions((prev) => ({
@@ -124,24 +113,53 @@ function Level1() {
     }))
   }
 
-  const handleCheckAnswer = () => {
+  const handleCheckAnswer = async () => {
+
     const query = normalize(sqlInput)
-    const missing = selected.checks.filter((check) => !query.includes(check))
+    const level = 1
+    const sublevel = currentSublevel
 
-    if (missing.length > 0) {
-      setMessage(
-        'Not quite. Your query is missing some mission conditions. Check SELECT/FROM/WHERE parts carefully.',
-      )
-      return
-    }
+    try {
+      setQueryOutput([])
+      const response = await fetch('http://localhost:8000/api/verifycode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query, level, sublevel }),
+      })
 
-    setMessage(`Solved! ${selected.reveal}`)
+      const data = await response.json()
 
-    const nextStep =
-      typeof selected.id === 'number' ? Math.min(selected.id + 1, sublevels.length) : sublevels.length
+      if (!response.ok) {
+        setMessage(data.detail ?? 'Failed to verify query.')
+        return
+      }
 
-    if (nextStep > maxUnlocked) {
-      setMaxUnlocked(nextStep)
+      setQueryOutput(Array.isArray(data.output) ? data.output : [])
+
+      if (data.is_correct) {
+        setMessage(`Solved! ${selected.reveal}`)
+        const nextStep =
+          typeof selected.id === 'number' ? Math.min(selected.id + 1, sublevels.length) : sublevels.length
+        if (nextStep > maxUnlocked) {
+          setMaxUnlocked(nextStep)
+        }
+
+        const finalSublevelId = sublevels[sublevels.length - 1]?.id
+        if (selected.id === finalSublevelId) {
+          const unlockedLevel = Number(localStorage.getItem('level') ?? '1')
+          localStorage.setItem('level', String(Number.isNaN(unlockedLevel) ? 2 : Math.max(unlockedLevel, 2)))
+        }
+        return
+      }
+
+      setMessage(data.error ?? 'Not quite. Compare your result with mission goal.')
+    } 
+    
+    catch (error) {
+      console.error('Error:', error)
+      setMessage('Could not connect to server. Is backend running on port 8000?')
     }
   }
 
@@ -204,67 +222,109 @@ function Level1() {
         </div>
       </section>
 
-      <section className="play-layout">
-        <section className="sublevel-map" aria-label="Sublevel roadmap">
-          {sublevels.map((sub, index) => {
-            const status = getStatus(sub.id)
-            const isLocked = status === 'locked'
+      <section className="container">
+        <div className="row ">
+          <section className="sublevel-map col-lg-6" aria-label="Sublevel roadmap">
+            {sublevels.map((sub, index) => {
+              const status = getStatus(sub.id)
+              const isLocked = status === 'locked'
 
-            return (
-              <div
-                key={String(sub.id)}
-                className={`sublevel-wrapper ${index % 2 === 0 ? 'left' : 'right'} ${status}`}
-              >
-                <div className="sublevel-path" aria-hidden="true" />
-                <button
-                  type="button"
-                  className={`sublevel-node ${status}`}
-                  disabled={isLocked}
-                  onClick={() => {
-                    if (!isLocked) {
-                      setCurrentSublevel(sub.id)
-                      setSqlInput('')
-                      setMessage('')
-                    }
-                  }}
+              return (
+                <div
+                  key={String(sub.id)}
+                  className={`sublevel-wrapper ${index % 2 === 0 ? 'left' : 'right'} ${status}`}
                 >
-                  <span>{sub.id}</span>
-                </button>
-                <article className={`sublevel-card ${status}`}>
-                  <h3>{sub.title}</h3>
-                  <p>{sub.skill}</p>
-                </article>
-              </div>
-            )
-          })}
-        </section>
+                  <div className="sublevel-path" aria-hidden="true" />
+                  <button
+                    type="button"
+                    className={`sublevel-node ${status}`}
+                    disabled={isLocked}
+                    onClick={() => {
+                      if (!isLocked) {
+                        setCurrentSublevel(sub.id)
+                        setSqlInput('')
+                        setMessage('')
+                        setQueryOutput([])
+                      }
+                    }}
+                  >
+                    <span>{sub.id}</span>
+                  </button>
+                  <article className={`sublevel-card ${status}`}>
+                    <h3>{sub.title}</h3>
+                    <p>{sub.skill}</p>
+                  </article>
+                </div>
+              )
+            })}
+          </section>
 
-        <section className="challenge-panel">
-          <p className="sub-id">Sublevel {selected.id}</p>
-          <h2>{selected.title}</h2>
-          <p>
-            <strong>Briefing:</strong> {selected.briefing}
-          </p>
-          <p>
-            <strong>Mission:</strong> {selected.mission}
-          </p>
-          <p>
-            <strong>Pass condition:</strong> {selected.passCondition}
-          </p>
-          <textarea
-            className="sql-input"
-            placeholder="Write your SQL query here..."
-            value={sqlInput}
-            onChange={(event) => setSqlInput(event.target.value)}
-          />
-          <button type="button" className="check-btn" onClick={handleCheckAnswer}>
-            Run Query Check
-          </button>
-          {message && <p className="feedback">{message}</p>}
-        </section>
+          <section className="challenge-panel col-lg-6 h-100">
+            <p className="sub-id">Sublevel {selected.id}</p>
+            <h2>{selected.title}</h2>
+            <p>
+              <strong>Briefing:</strong> {selected.briefing}
+            </p>
+            <p>
+              <strong>Mission:</strong> {selected.mission}
+            </p>
+            <p>
+              <strong>Pass condition:</strong> {selected.passCondition}
+            </p>
+            <textarea
+              className="sql-input"
+              placeholder="Write your SQL query here..."
+              value={sqlInput}
+              onChange={(event) => setSqlInput(event.target.value)}
+            />
+            <button type="button" className="check-btn my-2" onClick={handleCheckAnswer}>
+              Run Query Check
+            </button>
+            {message && <p className="feedback">{message}</p>}
+            {queryOutput.length > 0 && (
+              <div className="feedback" style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr>
+                      {Object.keys(queryOutput[0]).map((column) => (
+                        <th
+                          key={column}
+                          style={{
+                            border: '1px solid #4a4a4a',
+                            padding: '8px',
+                            textAlign: 'left',
+                          }}
+                        >
+                          {column}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {queryOutput.map((row, rowIndex) => (
+                      <tr key={rowIndex}>
+                        {Object.keys(queryOutput[0]).map((column) => (
+                          <td
+                            key={`${rowIndex}-${column}`}
+                            style={{
+                              border: '1px solid #4a4a4a',
+                              padding: '8px',
+                            }}
+                          >
+                            {String(row[column] ?? '')}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
       </section>
 
-      <section className="skills-covered">
+      <section className="skills-covered mt-2">
         <h2>SQL Skills Covered in Case File 01</h2>
         <ul>
           <li>SELECT and column targeting</li>

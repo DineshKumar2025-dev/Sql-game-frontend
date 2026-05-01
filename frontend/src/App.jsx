@@ -5,7 +5,7 @@ import Home from './pages/home/home'
 import Levels from './pages/levels/levels'
 import Level1 from './pages/game/level1'
 import Authanticate from './authenticate/Authanticate'
-
+import 'bootstrap/dist/css/bootstrap.min.css'
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => Boolean(localStorage.getItem('login_status')),
