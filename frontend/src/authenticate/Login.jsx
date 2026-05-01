@@ -7,16 +7,43 @@ function Login({ onSwitchToSignup, onLoginSuccess }) {
   const [remember, setRemember] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const canSubmit = /\S+@\S+\.\S+/.test(email) && password.length >= 8
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitted(true)
+    setError('')
 
     if (!canSubmit) return
 
-    localStorage.setItem('login_status', 'true')
-    onLoginSuccess?.()
+    setIsLoading(true)
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          password,
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setError(data.detail ?? 'Login failed.')
+        return
+      }
+
+      localStorage.setItem('login_status', 'true')
+      localStorage.setItem('auth_token', data.token ?? '')
+      localStorage.setItem('user', JSON.stringify(data.user ?? {}))
+      onLoginSuccess?.()
+    } catch (submitError) {
+      setError('Server error while signing in.')
+      console.error(submitError)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -70,11 +97,12 @@ function Login({ onSwitchToSignup, onLoginSuccess }) {
             </button>
           </div>
 
-          <button className="auth-btn" type="submit" disabled={!canSubmit}>
+          <button className="auth-btn" type="submit" disabled={!canSubmit || isLoading}>
             Sign In
           </button>
 
-          {submitted && canSubmit && (
+          {error && <p className="field-error">{error}</p>}
+          {submitted && canSubmit && !error && (
             <p className="success-text">Signed in successfully. Welcome back!</p>
           )}
         </form>

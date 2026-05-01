@@ -14,7 +14,10 @@ function Authanticate({ onLoginSuccess }) {
           onLoginSuccess={onLoginSuccess}
         />
       ) : (
-        <Signup onSwitchToLogin={() => setIsLoginPage(true)} />
+        <Signup
+          onSwitchToLogin={() => setIsLoginPage(true)}
+          onSignupSuccess={onLoginSuccess}
+        />
       )}
     </div>
   )

@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
+import emailjs from '@emailjs/browser'
 import './auth.css'
 
-function Signup({ onSwitchToLogin }) {
+function Signup({ onSwitchToLogin, onSignupSuccess }) {
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -11,6 +12,11 @@ function Signup({ onSwitchToLogin }) {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const passwordStrength = useMemo(() => {
     const { password } = form
@@ -43,9 +49,89 @@ function Signup({ onSwitchToLogin }) {
     }))
   }
 
-  const handleSubmit = (event) => {
+  const sendOtpWithEmailJs = async (receiverEmail, otpCode, receiverName) => {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+    if (!serviceId || !templateId || !publicKey) {
+      throw new Error('EmailJS environment variables are missing.')
+    }
+
+    await emailjs.send(
+      serviceId,
+      templateId,
+      {
+        to_email: receiverEmail,
+        otp: otpCode,
+        name: receiverName,
+      },
+      {
+        publicKey,
+      },
+    )
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault()
     setSubmitted(true)
+    setError('')
+    setSuccess('')
+
+    if (!canSubmit) return
+
+    setIsLoading(true)
+    try {
+      if (!otpSent) {
+        const response = await fetch('http://localhost:8000/api/auth/request-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_name: form.fullName.trim(),
+            email: form.email.trim().toLowerCase(),
+            password: form.password,
+          }),
+        })
+        const data = await response.json()
+        if (!response.ok) {
+          setError(data.detail ?? 'Failed to request OTP.')
+          return
+        }
+
+        await sendOtpWithEmailJs(form.email.trim(), data.otp, form.fullName.trim())
+        setOtpSent(true)
+        setSuccess('OTP sent. Check your email and enter it below.')
+        return
+      }
+
+      const response = await fetch('http://localhost:8000/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_name: form.fullName.trim(),
+          email: form.email.trim().toLowerCase(),
+          password: form.password,
+          otp: otp.trim(),
+        }),
+      })
+      const data = await response.json()
+      if (!response.ok) {
+        setError(data.detail ?? 'Signup failed.')
+        return
+      }
+
+      setSuccess('Account created successfully.')
+      localStorage.setItem('login_status', 'true')
+      localStorage.setItem('user', JSON.stringify(data.user ?? {}))
+      setOtp('')
+      setOtpSent(false)
+      onSignupSuccess?.()
+    } catch (submitError) {
+      setError('Server error while processing signup.')
+      console.error(submitError)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -129,13 +215,25 @@ function Signup({ onSwitchToLogin }) {
             I agree to the Terms and Privacy Policy.
           </label>
 
-          <button className="auth-btn" type="submit" disabled={!canSubmit}>
-            Create Account
+          {otpSent && (
+            <label>
+              OTP
+              <input
+                type="text"
+                name="otp"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={(event) => setOtp(event.target.value)}
+              />
+            </label>
+          )}
+
+          <button className="auth-btn" type="submit" disabled={!canSubmit || isLoading}>
+            {otpSent ? 'Verify OTP & Create Account' : 'Send OTP'}
           </button>
 
-          {submitted && canSubmit && (
-            <p className="success-text">Account created! Let&apos;s get you started.</p>
-          )}
+          {error && <p className="field-error">{error}</p>}
+          {submitted && canSubmit && success && <p className="success-text">{success}</p>}
         </form>
 
         <p className="switch-text">
