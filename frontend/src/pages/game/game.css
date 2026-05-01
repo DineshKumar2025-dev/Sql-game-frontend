@@ -243,6 +243,11 @@
   color: #fff;
 }
 
+.check-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
 .feedback {
   margin-top: 10px;
   padding: 10px;
@@ -250,6 +255,52 @@
   background: rgba(51, 65, 85, 0.65);
   border: 1px solid rgba(148, 163, 184, 0.3);
   color: #dbeafe;
+}
+
+.feedback-error {
+  background: rgba(127, 29, 29, 0.35);
+  border-color: rgba(248, 113, 113, 0.35);
+  color: #fecaca;
+}
+
+.query-output {
+  margin-top: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  background: rgba(15, 23, 42, 0.8);
+  padding: 10px;
+}
+
+.query-output h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.query-table-wrap {
+  overflow-x: auto;
+}
+
+.query-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.query-table th,
+.query-table td {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  padding: 6px 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.query-table th {
+  background: rgba(51, 65, 85, 0.7);
+  color: #e2e8f0;
+}
+
+.query-table td {
+  color: #cbd5e1;
 }
 
 .skills-covered h2 {
