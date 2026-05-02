@@ -35,6 +35,22 @@
   color: #cbd5e1;
 }
 
+.levels-loading,
+.levels-load-error {
+  max-width: 980px;
+  margin: 12px auto 0;
+  padding: 14px 18px;
+  border-radius: 12px;
+  text-align: center;
+  color: #cbd5e1;
+}
+
+.levels-load-error {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.35);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+}
+
 .roadmap {
   max-width: 980px;
   margin: 0 auto;

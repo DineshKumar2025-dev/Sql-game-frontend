@@ -2,30 +2,57 @@ import './levels.css'
 import { useState, useEffect } from 'react'
 import Playmap from '../playmap'
 
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
 function Levels() {
   const [level, setLevel] = useState(
-    localStorage.getItem('level') ? parseInt(localStorage.getItem('level'), 10) : 1,
+    localStorage.getItem('level') ? Number(localStorage.getItem('level')) || 1 : 1,
   )
-
   useEffect(() => {
-    localStorage.setItem('level', level)
+    localStorage.setItem('level', String(level))
   }, [level])
 
-  const levels = [
-    { id: 1, title: 'Case File 01', topic: 'The Vanishing Employee', page: '/levels/1' },
-    { id: 2, title: 'Case File 02', topic: 'ORDER BY and LIMIT', page: '/levels/2' },
-    { id: 3, title: 'Case File 03', topic: 'JOINS Basics', page: '/levels/3' },
-    { id: 4, title: 'Case File 04', topic: 'GROUP BY and HAVING', page: '/levels/4' },
-    { id: 5, title: 'Case File 05', topic: 'Subqueries', page: '/levels/5' },
-    { id: 6, title: 'Case File 06', topic: 'CTEs', page: '/levels/6' },
-    { id: 7, title: 'Case File 07', topic: 'CRUD Missions', page: '/levels/7' },
-    { id: 8, title: 'Case File 08', topic: 'Transactions and ACID', page: '/levels/8' },
-    { id: 9, title: 'Case File 09', topic: 'Indexes and Optimization', page: '/levels/9' },
-  ]
+  const [levels, setLevels] = useState([])
+  const [loadError, setLoadError] = useState(null)
 
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      setLoadError(null)
+      try {
+        const res = await fetch(`${API_BASE}/api/getlevels`, {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        })
+        if (!res.ok) {
+          const text = await res.text()
+          throw new Error(text || res.statusText)
+        }
+        const data = await res.json()
+        if (cancelled) return
+        const withRoutes = (Array.isArray(data) ? data : []).map((row) => ({
+          ...row,
+          page: `/levels/${row.id}`,
+        }))
+        setLevels(withRoutes)
+      } catch (err) {
+        if (!cancelled) {
+          console.error('Failed to load levels:', err)
+          setLoadError(err.message || 'Failed to load levels')
+          setLevels([])
+        }
+      }
+    }
+    load()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const currentLevel = Number(level) || 1
   const getStatus = (id) => {
-    if (id < level) return 'completed'
-    if (id === level) return 'current'
+    if (id < currentLevel) return 'completed'
+    if (id === currentLevel) return 'current'
     return 'locked'
   }
 
@@ -40,7 +67,17 @@ function Levels() {
         </p>
       </section>
 
-      <Playmap levels={levels} getStatus={getStatus} setLevel={setLevel} />
+      {loadError ? (
+        <p className="levels-load-error" role="alert">
+          Could not load levels: {loadError}
+        </p>
+      ) : null}
+
+      {levels.length > 0 ? (
+        <Playmap levels={levels} getStatus={getStatus} setLevel={setLevel} />
+      ) : !loadError ? (
+        <p className="levels-loading">Loading missions…</p>
+      ) : null}
     </main>
   )
 }

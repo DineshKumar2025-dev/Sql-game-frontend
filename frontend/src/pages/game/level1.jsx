@@ -4,7 +4,7 @@ import DraggableNode from './DraggableNode'
 
 const sublevels = [
   {
-    id: 1,
+    id: 'L01',
     title: 'Who is Missing?',
     briefing:
       'Pull the full employee roster before narrowing down suspects. Start with the complete view.',
@@ -16,7 +16,7 @@ const sublevels = [
     checks: ['select', 'name', 'department', 'role', 'status', 'from', 'employees'],
   },
   {
-    id: 2,
+    id: 'L02',
     title: 'Isolate the Missing',
     briefing:
       'Now filter out active staff. Focus only on suspicious statuses to identify who is off-pattern.',
@@ -28,7 +28,7 @@ const sublevels = [
     checks: ['from', 'employees', 'where', 'status', '!=', 'active'],
   },
   {
-    id: 3,
+    id: 'L03',
     title: 'High Clearance Suspects',
     briefing:
       'Only high-clearance Engineering staff could access ORACLE. Narrow suspects by role and clearance.',
@@ -40,7 +40,7 @@ const sublevels = [
     checks: ['from', 'employees', 'where', 'department', 'engineering', 'clearance', 'in'],
   },
   {
-    id: 4,
+    id: 'L04',
     title: 'The Night Shift',
     briefing:
       'Inspect server room access on 2047-09-14 after 22:00. ORACLE data lived there.',
@@ -52,7 +52,7 @@ const sublevels = [
     checks: ['from', 'access_logs', 'where', 'location', 'server room', 'timestamp', '22:00'],
   },
   {
-    id: 5,
+    id: 'L05',
     title: 'Find the Accomplice',
     briefing:
       'A suspended badge cannot self-authorize. Pull Security staff who could allow late-night entry.',
@@ -248,7 +248,7 @@ function Level1() {
                       }
                     }}
                   >
-                    <span>{sub.id}</span>
+                    <span>{(sub.id).slice(-1)}</span>
                   </button>
                   <article className={`sublevel-card ${status}`}>
                     <h3>{sub.title}</h3>
