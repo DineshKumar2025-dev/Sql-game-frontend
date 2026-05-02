@@ -121,7 +121,7 @@ function Level1() {
 
     try {
       setQueryOutput([])
-      const response = await fetch('http://localhost:8000/api/verifycode', {
+      const response = await fetch(`${API_BASE}/api/verifycode`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
