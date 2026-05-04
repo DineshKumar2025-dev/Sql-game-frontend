@@ -2,7 +2,7 @@ const API_BASE = import.meta.env.VITE_API_URL;
 
 async function sub_level(level) {
     const levelNum = Number(level);
-    const user_id = localStorage.getItem('user_id'); // read fresh each call
+    const user_id = Number(localStorage.getItem('user_id')); // read fresh each call
 
     const response = await fetch(
         `${API_BASE}/api/levels/level_sublevel?level=${encodeURIComponent(levelNum)}&user_id=${encodeURIComponent(user_id)}`,
@@ -14,8 +14,25 @@ async function sub_level(level) {
     }
 
     const data = await response.json();
-    console.log(data.level_id);
+    console.log(data)
     return data.level_id;
 }
 
+async function get_sql_query(level) {
+    // Sublevel id string (e.g. l11) — must match verifycode / DB level_id, not a numeric row id.
+    const levelKey = level == null ? '' : String(level).trim();
+    const user_id = Number(localStorage.getItem('user_id')); // read fresh each call
+    const response = await fetch(
+        `${API_BASE}/api/levels/sublevel_query?level=${encodeURIComponent(levelKey)}&user_id=${encodeURIComponent(user_id)}`,
+        { method: 'GET' }
+    );
+    if (!response.ok) {
+        throw new Error(`Failed to get sublevel: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.query;
+}
+
 export default sub_level;
+export { get_sql_query };

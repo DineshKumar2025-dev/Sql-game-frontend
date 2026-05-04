@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './game.css'
 import DraggableNode from './DraggableNode'
-import sub_level from './common'
+import sub_level, { get_sql_query } from './common'
 const API_BASE = import.meta.env.VITE_API_URL 
 const sublevels = [
   {
@@ -100,6 +100,7 @@ function getStoredUserId() {
   }
 }
 
+
 async function readJsonResponse(response) {
   const text = await response.text()
   if (!text) return {}
@@ -112,7 +113,7 @@ async function readJsonResponse(response) {
 
 function Level1() {
   const [currentSublevel, setCurrentSublevel] = useState('l11')
-
+  
   const resolveSublevelId = (value) => {
     if (typeof value === 'string') {
       const normalized = value.trim().toLowerCase()
@@ -126,6 +127,7 @@ function Level1() {
 
     return null
   }
+
 
   useEffect(() => {
     const fetchSublevel = async () => {
@@ -142,7 +144,19 @@ function Level1() {
     }
     fetchSublevel()
   }, [])
-  const [sqlInput, setSqlInput] = useState('')
+  const selected = useMemo(
+    () => sublevels.find((sub) => sub.id === currentSublevel) ?? sublevels[0],
+    [currentSublevel],
+  )
+  const [sqlInput, setSqlInput] = useState('');
+  useEffect(() => {
+      if (!selected?.id) return;
+
+      get_sql_query(selected.id)
+          .then(query => setSqlInput(query))
+          .catch(err => console.error('Failed to load query:', err));
+
+  }, [selected?.id]);
   const [maxUnlocked, setMaxUnlocked] = useState(initialMaxUnlocked)
   const [message, setMessage] = useState('')
   const [queryOutput, setQueryOutput] = useState([])
@@ -153,10 +167,7 @@ function Level1() {
   const schemaBoardRef = useRef(null)
   const tableSize = { width: 300, height: 190 }
 
-  const selected = useMemo(
-    () => sublevels.find((sub) => sub.id === currentSublevel) ?? sublevels[0],
-    [currentSublevel],
-  )
+
 
   const getStatus = (id) => {
     if (maxUnlocked === CASE_COMPLETE) {
@@ -170,6 +181,8 @@ function Level1() {
     if (idx === maxIdx) return 'current'
     return 'locked'
   }
+
+
 
   const normalize = (text) => text.replace(/\s+/g, ' ').trim()
 
@@ -389,7 +402,7 @@ function Level1() {
               className="sql-input"
               placeholder="Write your SQL query here..."
               value={sqlInput}
-              onChange={(event) => setSqlInput(event.target.value)}
+              onChange={(e) => setSqlInput(e.target.value)}
             />
             <button type="button" className="check-btn my-2" onClick={handleCheckAnswer}>
               Run Query Check
