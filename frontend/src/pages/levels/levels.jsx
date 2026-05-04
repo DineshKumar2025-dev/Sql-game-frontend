@@ -2,7 +2,7 @@ import './levels.css'
 import { useState, useEffect } from 'react'
 import Playmap from '../playmap'
 
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_URL 
 
 function Levels() {
   const [level, setLevel] = useState(

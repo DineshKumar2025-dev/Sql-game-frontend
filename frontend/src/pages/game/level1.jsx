@@ -1,10 +1,10 @@
 import { useMemo, useRef, useState } from 'react'
 import './game.css'
 import DraggableNode from './DraggableNode'
-
+const API_BASE = import.meta.env.VITE_API_URL 
 const sublevels = [
   {
-    id: 'L01',
+    id: 'l11',
     title: 'Who is Missing?',
     briefing:
       'Pull the full employee roster before narrowing down suspects. Start with the complete view.',
@@ -16,7 +16,7 @@ const sublevels = [
     checks: ['select', 'name', 'department', 'role', 'status', 'from', 'employees'],
   },
   {
-    id: 'L02',
+    id: 'l12',
     title: 'Isolate the Missing',
     briefing:
       'Now filter out active staff. Focus only on suspicious statuses to identify who is off-pattern.',
@@ -28,7 +28,7 @@ const sublevels = [
     checks: ['from', 'employees', 'where', 'status', '!=', 'active'],
   },
   {
-    id: 'L03',
+    id: 'l13',
     title: 'High Clearance Suspects',
     briefing:
       'Only high-clearance Engineering staff could access ORACLE. Narrow suspects by role and clearance.',
@@ -40,7 +40,7 @@ const sublevels = [
     checks: ['from', 'employees', 'where', 'department', 'engineering', 'clearance', 'in'],
   },
   {
-    id: 'L04',
+    id: 'l14',
     title: 'The Night Shift',
     briefing:
       'Inspect server room access on 2047-09-14 after 22:00. ORACLE data lived there.',
@@ -52,7 +52,7 @@ const sublevels = [
     checks: ['from', 'access_logs', 'where', 'location', 'server room', 'timestamp', '22:00'],
   },
   {
-    id: 'L05',
+    id: 'l15',
     title: 'Find the Accomplice',
     briefing:
       'A suspended badge cannot self-authorize. Pull Security staff who could allow late-night entry.',
@@ -80,10 +80,32 @@ const employeesFields = [
 
 const accessLogFields = ['id (PK)', 'employee_id (FK)', 'location', 'timestamp', 'action']
 
+function getStoredUserId() {
+  try {
+    const raw = localStorage.getItem('user')
+    if (!raw) return null
+    const user = JSON.parse(raw)
+    const id = user?.user_id ?? user?.id
+    return id != null ? Number(id) : null
+  } catch {
+    return null
+  }
+}
+
+async function readJsonResponse(response) {
+  const text = await response.text()
+  if (!text) return {}
+  try {
+    return JSON.parse(text)
+  } catch {
+    return { _parseError: true, _raw: text.slice(0, 200) }
+  }
+}
+
 function Level1() {
-  const [currentSublevel, setCurrentSublevel] = useState(1)
+  const [currentSublevel, setCurrentSublevel] = useState('l11')
   const [sqlInput, setSqlInput] = useState('')
-  const [maxUnlocked, setMaxUnlocked] = useState(1)
+  const [maxUnlocked, setMaxUnlocked] = useState('l11')
   const [message, setMessage] = useState('')
   const [queryOutput, setQueryOutput] = useState([])
   const [tablePositions, setTablePositions] = useState({
@@ -99,12 +121,26 @@ function Level1() {
   )
 
   const getStatus = (id) => {
-    if (id < maxUnlocked) return 'completed'
-    if (id === maxUnlocked) return 'current'
+    const maxIdx = sublevels.findIndex((s) => s.id === maxUnlocked)
+    const idx = sublevels.findIndex((s) => s.id === id)
+    if (idx < 0 || maxIdx < 0) return 'locked'
+    if (idx < maxIdx) return 'completed'
+    if (idx === maxIdx) return 'current'
     return 'locked'
   }
 
   const normalize = (text) => text.replace(/\s+/g, ' ').trim()
+
+  const formatApiDetail = (detail) => {
+    if (detail == null) return null
+    if (typeof detail === 'string') return detail
+    if (Array.isArray(detail)) {
+      return detail
+        .map((entry) => (typeof entry === 'object' && entry?.msg ? entry.msg : String(entry)))
+        .join(' ')
+    }
+    return String(detail)
+  }
 
   const updateTablePosition = (tableId, position) => {
     setTablePositions((prev) => ({
@@ -114,10 +150,14 @@ function Level1() {
   }
 
   const handleCheckAnswer = async () => {
-
+    const user_id = getStoredUserId()
     const query = normalize(sqlInput)
     const level = 1
     const sublevel = currentSublevel
+    if (!query) {
+      setMessage('Write a SQL query before running the check.')
+      return
+    }
 
     try {
       setQueryOutput([])
@@ -126,13 +166,26 @@ function Level1() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ query, level, sublevel }),
+        body: JSON.stringify({
+          query,
+          level,
+          sublevel,
+          user_id: user_id, 
+        }),
       })
 
-      const data = await response.json()
+      const data = await readJsonResponse(response)
+      if (data._parseError) {
+        setMessage(
+          response.ok
+            ? 'Server returned a non-JSON response.'
+            : `Request failed (${response.status}). ${data._raw || ''}`.trim(),
+        )
+        return
+      }
 
       if (!response.ok) {
-        setMessage(data.detail ?? 'Failed to verify query.')
+        setMessage(formatApiDetail(data.detail) ?? 'Failed to verify query.')
         return
       }
 
@@ -140,10 +193,14 @@ function Level1() {
 
       if (data.is_correct) {
         setMessage(`Solved! ${selected.reveal}`)
-        const nextStep =
-          typeof selected.id === 'number' ? Math.min(selected.id + 1, sublevels.length) : sublevels.length
-        if (nextStep > maxUnlocked) {
-          setMaxUnlocked(nextStep)
+        const idx = sublevels.findIndex((s) => s.id === selected.id)
+        if (idx >= 0) {
+          const nextIdx = Math.min(idx + 1, sublevels.length - 1)
+          const nextId = sublevels[nextIdx].id
+          const maxIdx = sublevels.findIndex((s) => s.id === maxUnlocked)
+          if (nextIdx > maxIdx) {
+            setMaxUnlocked(nextId)
+          }
         }
 
         const finalSublevelId = sublevels[sublevels.length - 1]?.id
@@ -151,6 +208,7 @@ function Level1() {
           const unlockedLevel = Number(localStorage.getItem('level') ?? '1')
           localStorage.setItem('level', String(Number.isNaN(unlockedLevel) ? 2 : Math.max(unlockedLevel, 2)))
         }
+        console.log(data.user_id)
         return
       }
 
@@ -159,7 +217,15 @@ function Level1() {
     
     catch (error) {
       console.error('Error:', error)
-      setMessage('Could not connect to server. Is backend running on port 8000?')
+      const reason = error instanceof Error ? error.message : String(error)
+      const isNetwork =
+        /fetch|network|failed to load|load failed|aborted|ERR_/i.test(reason) ||
+        (typeof error === 'object' && error !== null && 'name' in error && error.name === 'TypeError')
+      setMessage(
+        isNetwork
+          ? `Cannot reach API at ${API_BASE}. Start the backend (e.g. port 8000) and confirm VITE_API_URL in .env. (${reason})`
+          : `Something went wrong: ${reason}`,
+      )
     }
   }
 

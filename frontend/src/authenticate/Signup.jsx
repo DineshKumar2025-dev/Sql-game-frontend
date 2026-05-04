@@ -123,6 +123,7 @@ function Signup({ onSwitchToLogin, onSignupSuccess }) {
       setSuccess('Account created successfully.')
       localStorage.setItem('login_status', 'true')
       localStorage.setItem('user', JSON.stringify(data.user ?? {}))
+      localStorage.setItem('user_id', data.user.user_id);
       setOtp('')
       setOtpSent(false)
       onSignupSuccess?.()

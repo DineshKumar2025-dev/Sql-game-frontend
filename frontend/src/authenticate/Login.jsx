@@ -36,7 +36,8 @@ function Login({ onSwitchToSignup, onLoginSuccess }) {
 
       localStorage.setItem('login_status', 'true')
       localStorage.setItem('auth_token', data.token ?? '')
-      localStorage.setItem('user', JSON.stringify(data.user ?? {}))
+      localStorage.setItem('user', JSON.stringify(data.user ?? {}))      
+      localStorage.setItem('user_id', data.user.user_id);
       onLoginSuccess?.()
     } catch (submitError) {
       setError('Server error while signing in.')
