@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './game.css'
 import DraggableNode from './DraggableNode'
+import sub_level from './common'
 const API_BASE = import.meta.env.VITE_API_URL 
 const sublevels = [
   {
@@ -111,6 +112,36 @@ async function readJsonResponse(response) {
 
 function Level1() {
   const [currentSublevel, setCurrentSublevel] = useState('l11')
+
+  const resolveSublevelId = (value) => {
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase()
+      if (sublevels.some((sub) => sub.id === normalized)) return normalized
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      const mapped = `l1${value}`
+      if (sublevels.some((sub) => sub.id === mapped)) return mapped
+    }
+
+    return null
+  }
+
+  useEffect(() => {
+    const fetchSublevel = async () => {
+      try {
+        const backendSublevel = await sub_level(1)
+        const resolved = resolveSublevelId(backendSublevel)
+        if (resolved) {
+          setCurrentSublevel(resolved)
+          setMaxUnlocked(resolved)
+        }
+      } catch (error) {
+        console.error('Failed to load saved sublevel:', error)
+      }
+    }
+    fetchSublevel()
+  }, [])
   const [sqlInput, setSqlInput] = useState('')
   const [maxUnlocked, setMaxUnlocked] = useState(initialMaxUnlocked)
   const [message, setMessage] = useState('')
