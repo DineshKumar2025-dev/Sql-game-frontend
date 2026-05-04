@@ -1,13 +1,20 @@
 import './levels.css'
 import { useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import Playmap from '../playmap'
 
 const API_BASE = import.meta.env.VITE_API_URL 
-
+const highest_level_completed = Number(localStorage.getItem('highest_level_completed')) || 0;
 function Levels() {
-  const [level, setLevel] = useState(
-    localStorage.getItem('level') ? Number(localStorage.getItem('level')) || 1 : 1,
-  )
+  const location = useLocation()
+  const [level, setLevel] = useState(highest_level_completed)
+
+  useEffect(() => {
+    if (location.pathname === '/levels') {
+      setLevel(highest_level_completed)
+    }
+  }, [location.pathname])
+
   useEffect(() => {
     localStorage.setItem('level', String(level))
   }, [level])
@@ -74,7 +81,7 @@ function Levels() {
       ) : null}
 
       {levels.length > 0 ? (
-        <Playmap levels={levels} getStatus={getStatus} setLevel={setLevel} />
+        <Playmap levels={levels} getStatus={getStatus} />
       ) : !loadError ? (
         <p className="levels-loading">Loading missions…</p>
       ) : null}

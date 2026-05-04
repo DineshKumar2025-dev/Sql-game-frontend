@@ -124,6 +124,7 @@ function Signup({ onSwitchToLogin, onSignupSuccess }) {
       localStorage.setItem('login_status', 'true')
       localStorage.setItem('user', JSON.stringify(data.user ?? {}))
       localStorage.setItem('user_id', data.user.user_id);
+      localStorage.setItem('highest_level_completed', data.user.highest_level_completed)
       setOtp('')
       setOtpSent(false)
       onSignupSuccess?.()

@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './game.css'
 import DraggableNode from './DraggableNode'
 const API_BASE = import.meta.env.VITE_API_URL 
@@ -63,8 +63,15 @@ const sublevels = [
     skill: 'Multi-condition WHERE + IN()',
     checks: ['from', 'employees', 'where', 'department', 'security', 'floor', '1', 'clearance'],
   },
-  
 ]
+
+/** All sublevels solved — distinct from any real sublevel id so the last node shows as completed. */
+const CASE_COMPLETE = '__case_complete__'
+
+function initialMaxUnlocked() {
+  const chapter = Number(localStorage.getItem('level') ?? '1')
+  return !Number.isNaN(chapter) && chapter >= 2 ? CASE_COMPLETE : 'l11'
+}
 
 const employeesFields = [
   'id (PK)',
@@ -105,7 +112,7 @@ async function readJsonResponse(response) {
 function Level1() {
   const [currentSublevel, setCurrentSublevel] = useState('l11')
   const [sqlInput, setSqlInput] = useState('')
-  const [maxUnlocked, setMaxUnlocked] = useState('l11')
+  const [maxUnlocked, setMaxUnlocked] = useState(initialMaxUnlocked)
   const [message, setMessage] = useState('')
   const [queryOutput, setQueryOutput] = useState([])
   const [tablePositions, setTablePositions] = useState({
@@ -121,6 +128,10 @@ function Level1() {
   )
 
   const getStatus = (id) => {
+    if (maxUnlocked === CASE_COMPLETE) {
+      const idx = sublevels.findIndex((s) => s.id === id)
+      return idx >= 0 ? 'completed' : 'locked'
+    }
     const maxIdx = sublevels.findIndex((s) => s.id === maxUnlocked)
     const idx = sublevels.findIndex((s) => s.id === id)
     if (idx < 0 || maxIdx < 0) return 'locked'
@@ -194,17 +205,23 @@ function Level1() {
       if (data.is_correct) {
         setMessage(`Solved! ${selected.reveal}`)
         const idx = sublevels.findIndex((s) => s.id === selected.id)
+        const finalSublevelId = sublevels[sublevels.length - 1]?.id
+        const isFinal = selected.id === finalSublevelId
+
         if (idx >= 0) {
-          const nextIdx = Math.min(idx + 1, sublevels.length - 1)
-          const nextId = sublevels[nextIdx].id
-          const maxIdx = sublevels.findIndex((s) => s.id === maxUnlocked)
-          if (nextIdx > maxIdx) {
-            setMaxUnlocked(nextId)
+          if (isFinal) {
+            setMaxUnlocked(CASE_COMPLETE)
+          } else {
+            const nextIdx = Math.min(idx + 1, sublevels.length - 1)
+            const nextId = sublevels[nextIdx].id
+            const maxIdx = sublevels.findIndex((s) => s.id === maxUnlocked)
+            if (nextIdx > maxIdx) {
+              setMaxUnlocked(nextId)
+            }
           }
         }
 
-        const finalSublevelId = sublevels[sublevels.length - 1]?.id
-        if (selected.id === finalSublevelId) {
+        if (isFinal) {
           const unlockedLevel = Number(localStorage.getItem('level') ?? '1')
           localStorage.setItem('level', String(Number.isNaN(unlockedLevel) ? 2 : Math.max(unlockedLevel, 2)))
         }

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 
-function Playmap({ levels, getStatus, setLevel }) {
+function Playmap({ levels, getStatus }) {
   const navigate = useNavigate()
 
   return (
@@ -19,7 +19,8 @@ function Playmap({ levels, getStatus, setLevel }) {
               className={`level-node ${status}`}
               disabled={status === 'locked'}
               onClick={() => {
-                setLevel(item.id)
+                // Do not write progress here — replaying an earlier mission must not lower
+                // localStorage `level`, or later missions appear locked again.
                 navigate(item.page)
               }}
               title={status === 'locked' ? 'Complete previous level first' : 'Play level'}
