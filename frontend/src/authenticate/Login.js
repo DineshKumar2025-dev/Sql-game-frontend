@@ -1,4 +1,4 @@
-const handleSubmit = (event, setSubmitted) => {
+const handleSubmit = (event, setSubmitted, navigate) => {
     event.preventDefault()
     setSubmitted(true)
     localStorage.setItem('login_status', true)

@@ -129,6 +129,8 @@ function Level1() {
   }
 
 
+  const [maxUnlocked, setMaxUnlocked] = useState(initialMaxUnlocked)
+
   useEffect(() => {
     const fetchSublevel = async () => {
       try {
@@ -157,7 +159,6 @@ function Level1() {
           .catch(err => console.error('Failed to load query:', err));
 
   }, [selected?.id]);
-  const [maxUnlocked, setMaxUnlocked] = useState(initialMaxUnlocked)
   const [message, setMessage] = useState('')
   const [queryOutput, setQueryOutput] = useState([])
   const [tablePositions, setTablePositions] = useState({

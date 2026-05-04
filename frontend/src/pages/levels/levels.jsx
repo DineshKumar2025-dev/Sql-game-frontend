@@ -1,19 +1,11 @@
 import './levels.css'
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 import Playmap from '../playmap'
 
 const API_BASE = import.meta.env.VITE_API_URL 
 const highest_level_completed = Number(localStorage.getItem('highest_level_completed')) || 0;
 function Levels() {
-  const location = useLocation()
-  const [level, setLevel] = useState(highest_level_completed)
-
-  useEffect(() => {
-    if (location.pathname === '/levels') {
-      setLevel(highest_level_completed)
-    }
-  }, [location.pathname])
+  const [level] = useState(highest_level_completed)
 
   useEffect(() => {
     localStorage.setItem('level', String(level))

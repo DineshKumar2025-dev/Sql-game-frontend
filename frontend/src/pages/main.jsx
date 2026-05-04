@@ -3,7 +3,6 @@ import Topbar from './Topbar'
 import { Outlet } from 'react-router-dom'
 
 function Main() {
-  const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
   const navigate = useNavigate()
   const location = useLocation()
   const activePage = location.pathname.startsWith('/levels') ? 'levels' : 'home'
