@@ -1,39 +1,92 @@
 .home {
   min-height: 100vh;
-  padding: 24px;
-  color: #e2e8f0;
-  background: radial-gradient(circle at top right, #312e81 0%, #0f172a 45%, #020617 100%);
+  padding: 28px 20px 44px;
+  color: #f1f5f9;
+  background:
+    radial-gradient(circle at top right, rgba(8, 145, 178, 0.14) 0%, rgba(0, 0, 0, 0) 46%),
+    radial-gradient(circle at top left, rgba(127, 29, 29, 0.12) 0%, rgba(0, 0, 0, 0) 38%),
+    linear-gradient(180deg, #020617 0%, #020b16 55%, #01040d 100%);
+}
+
+/* Hard contrast override: keep this until full theme settles */
+.home,
+.home * {
+  color: #f8fafc;
+}
+
+.home {
+  background-color: #020617 !important;
+}
+
+.home .hero,
+.home .card,
+.home .case-card,
+.home .chip,
+.home .code-item code {
+  background-color: #0b1220 !important;
+}
+
+.home .muted-text {
+  color: #cbd5e1 !important;
+}
+
+.home .case-topic,
+.home .case-id,
+.home .acid-item h3,
+.home .badge {
+  color: #67e8f9 !important;
 }
 
 .hero,
-.motive-grid,
+.overview-grid,
+.case-files,
 .grid {
-  max-width: 1020px;
+  max-width: 1100px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .hero {
-  margin-bottom: 20px;
-  padding: 26px;
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  margin-bottom: 18px;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(2, 10, 20, 0.97);
+  border: 1px solid rgba(34, 211, 238, 0.22);
+  box-shadow:
+    inset 0 0 0 1px rgba(8, 47, 73, 0.45),
+    0 20px 45px rgba(1, 4, 10, 0.45);
+}
+
+.hero::after {
+  content: 'SYSTEM STATUS: CASE TERMINAL ONLINE';
+  display: block;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(103, 232, 249, 0.35);
+  color: #67e8f9;
+  font-size: 0.78rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  font-family: 'Consolas', 'Courier New', monospace;
 }
 
 .badge {
   display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(99, 102, 241, 0.25);
-  color: #c7d2fe;
+  background: rgba(15, 118, 110, 0.25);
+  color: #a7f3d0;
   font-weight: 600;
   font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .hero h1 {
   margin: 12px 0 10px;
-  color: #f8fafc;
+  color: #ffffff;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: 0.03em;
 }
 
 .hero-actions {
@@ -53,14 +106,17 @@
 }
 
 .hero .secondary {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: linear-gradient(90deg, #0b3f5a, #0f766e);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #ecfeff;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.motive-grid {
+.overview-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1.4fr 1fr;
   margin-bottom: 16px;
 }
 
@@ -71,57 +127,93 @@
 }
 
 .card {
-  border-radius: 16px;
-  padding: 18px;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  background: rgba(3, 12, 24, 0.95);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow: inset 0 0 0 1px rgba(6, 36, 56, 0.45);
 }
 
 .card h2 {
   margin-top: 0;
-  margin-bottom: 10px;
-  color: #f8fafc;
+  margin-bottom: 12px;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 1rem;
+  font-family: 'Consolas', 'Courier New', monospace;
 }
 
 .card p {
   margin: 0 0 10px;
+  color: #e2e8f0;
 }
 
 .card ul {
   margin: 0;
   padding-left: 18px;
-}
-
-.wide {
-  min-height: 175px;
+  color: #e2e8f0;
 }
 
 .full-width {
   grid-column: 1 / -1;
 }
 
-.levels {
+.case-files {
+  margin-bottom: 16px;
+}
+
+.case-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 12px;
 }
 
-.level-item {
+.case-card {
   border-radius: 10px;
-  padding: 12px;
-  background: rgba(30, 41, 59, 0.75);
-  border: 1px solid rgba(148, 163, 184, 0.25);
+  padding: 12px 12px 10px;
+  background: rgba(1, 9, 18, 0.98);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.level-item h3 {
-  margin: 0 0 6px;
-  color: #c7d2fe;
-  font-size: 0.98rem;
-}
-
-.level-item p {
+.case-id {
   margin: 0;
-  color: #cbd5e1;
+  color: #67e8f9;
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.case-card h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.case-topic {
+  margin: 0;
+  color: #67e8f9;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
+.status-chip {
+  margin-top: auto;
+  align-self: flex-start;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(15, 118, 110, 0.28);
+  color: #ecfeff;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .dialects {
@@ -132,7 +224,8 @@
 .chip {
   border-radius: 10px;
   padding: 10px;
-  background: rgba(30, 41, 59, 0.75);
+  background: rgba(2, 10, 20, 0.96);
+  border: 1px solid rgba(56, 189, 248, 0.2);
   display: grid;
   gap: 4px;
 }
@@ -151,32 +244,65 @@
   margin-top: 6px;
   padding: 8px;
   border-radius: 8px;
-  background: #0b1220;
-  color: #c7d2fe;
+  background: #020617;
+  color: #bae6fd;
   font-size: 0.85rem;
   overflow-x: auto;
+  border: 1px solid rgba(34, 211, 238, 0.25);
 }
 
-.acid-list {
+.acid-grid {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
 }
 
-.acid-item h3 {
-  margin: 0 0 4px;
-  color: #a5b4fc;
+.acid-box {
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(1, 9, 18, 0.98);
+  border: 1px solid rgba(34, 211, 238, 0.25);
 }
 
-.acid-item p {
+.acid-box h3 {
+  margin: 0 0 8px;
+  color: #a5f3fc;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.95rem;
+}
+
+.acid-box h3 span {
+  color: #e2e8f0;
+  font-weight: 500;
+}
+
+.acid-box ul {
+  margin: 0 0 8px;
+  padding-left: 18px;
+}
+
+.acid-example {
   margin: 0;
+  color: #cbd5e1;
+  font-size: 0.88rem;
+}
+
+.acid-summary {
+  margin-top: 12px !important;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(15, 118, 110, 0.2);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  color: #ecfeff;
+  font-weight: 600;
 }
 
 .muted-text {
-  color: #94a3b8;
+  color: #cbd5e1;
 }
 
 @media (max-width: 880px) {
-  .motive-grid {
+  .overview-grid {
     grid-template-columns: 1fr;
   }
 

@@ -1,33 +1,24 @@
 import './home.css'
+import { useNavigate } from 'react-router-dom'
 
 function Home() {
+  const navigate = useNavigate()
   const motive = [
-    'Learn SQL by solving story-based missions instead of memorizing syntax.',
-    'Build real query skills that help in interviews, projects, and data jobs.',
-    'Understand not just what query works, but why it works.',
+    'Treat SQL like investigative action, not syntax memorization.',
+    'Extract clues from evidence archives, logs, transactions, and links.',
+    'Develop analyst-grade query thinking under active-case pressure.',
   ]
 
-  const gameFlow = [
-    {
-      level: 'Level 1 - Rookie Analyst',
-      objective: 'Learn SELECT, WHERE, ORDER BY by filtering simple clue tables.',
-    },
-    {
-      level: 'Level 2 - Street Investigator',
-      objective: 'Use JOINs to connect witnesses, suspects, and timelines.',
-    },
-    {
-      level: 'Level 3 - Forensic Specialist',
-      objective: 'Apply GROUP BY and aggregate functions to detect hidden patterns.',
-    },
-    {
-      level: 'Level 4 - Case Strategist',
-      objective: 'Use subqueries and CTEs to crack multi-step investigations.',
-    },
-    {
-      level: 'Level 5 - Chief Detective',
-      objective: 'Solve final missions using transactions, ACID, and optimization.',
-    },
+  const caseFiles = [
+    ['01', 'The Vanishing Employee', 'SELECT & WHERE', 'Identify who is missing and who had direct access to protected zones.'],
+    ['02', 'The Last Signal', 'ORDER BY & LIMIT', 'Reconstruct signal chronology and isolate the final receiver before evidence is erased.'],
+    ['03', 'The Black Market Broker', 'JOIN Basics', 'Connect buyers and sellers to expose ORACLE resale routes.'],
+    ['04', 'The Ghost Accounts', 'GROUP BY & HAVING', 'Aggregate micro-transactions to reveal laundering patterns hidden in row-level noise.'],
+    ['05', 'The Puppet Master', 'Subqueries', 'Unpeel proxy chains and reporting hierarchies to locate command authority.'],
+    ['06', 'The Memory Leak', 'CTEs (WITH)', 'Build a forensic query chain proving targeted neural-memory theft.'],
+    ['07', 'The Inside Job', 'CRUD Missions', 'Restore integrity by removing planted records and re-inserting true evidence.'],
+    ['08', 'The Double Spend', 'Transactions & ACID', 'Use transactional control to reverse race-condition ledger corruption.'],
+    ['09', 'The Slow Burn', 'Indexes & Optimization', 'Repair query performance sabotage and rebuild real-time detection capability.'],
   ]
 
   const basics = [
@@ -53,43 +44,74 @@ function Home() {
   ]
 
   const acid = [
-    { key: 'Atomicity', text: 'All steps succeed or none are saved.' },
-    { key: 'Consistency', text: 'Data stays valid before and after transactions.' },
-    { key: 'Isolation', text: 'Concurrent transactions do not conflict badly.' },
-    { key: 'Durability', text: 'Committed data survives crashes.' },
-  ]
-
-  const extraSqlConcepts = [
-    'Indexes and query performance basics',
-    'Normalization vs denormalization',
-    'Views and reusable query logic',
-    'Transactions and lock awareness',
+    {
+      key: 'Atomicity',
+      title: 'All or Nothing',
+      points: [
+        'A transaction must complete fully or not happen at all.',
+        'If any step fails, everything is rolled back.',
+        'No partial updates allowed.',
+      ],
+      example: 'Transfer money: Debit from A succeeds, Credit to B fails, so system cancels whole transaction.',
+    },
+    {
+      key: 'Consistency',
+      title: 'Valid State Only',
+      points: [
+        'After a transaction, the database must remain correct.',
+        'No invalid data is allowed.',
+        'Constraints (primary key, foreign key, checks) must hold.',
+      ],
+      example: 'A balance cannot become negative if a rule prevents it.',
+    },
+    {
+      key: 'Isolation',
+      title: 'No Interference',
+      points: [
+        'Multiple transactions should not affect each other while running.',
+        'Each transaction behaves as if it is running alone.',
+      ],
+      example: 'Two users updating the same row do not see each other’s incomplete changes.',
+    },
+    {
+      key: 'Durability',
+      title: 'Permanent Changes',
+      points: [
+        'Once a transaction is committed, it is permanently saved.',
+        'Committed data survives system crashes and power failures.',
+      ],
+      example: 'After payment success, the record is not lost even if the server crashes.',
+    },
   ]
 
   return (
     <main className="home">
       <section className="hero">
-        <p className="badge">Story Mode Enabled</p>
-        <h1>SQL Detective: Learn SQL Through Missions</h1>
+        <p className="badge">Case Terminal // Authorized Session</p>
+        <h1>The SQL Investigation System</h1>
         <p>
-          Every query is a clue. Every level is a case. You play as a detective who solves
-          mysteries by mastering SQL concepts in the right order.
+          You are inside a secured investigation system used by detectives to solve digital crimes.
+          Tables are evidence archives, queries are investigation actions, and results are live clues.
         </p>
         <p className="muted-text">
-          Each level unlocks new concepts and teaches SQL step by step, from beginner basics
-          to professional query mastery.
+          Every case file escalates the threat: missing persons, fraud, cybercrime, and conspiracy.
+          Progress comes from extracting truth step by step.
         </p>
 
         <div className="hero-actions">
-          <button type="button" className="secondary">
-            Start Game
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => navigate('/levels')}
+          >
+            Open Case Terminal
           </button>
         </div>
       </section>
 
-      <section className="motive-grid">
-        <article className="card wide">
-          <h2>Motive of the Game</h2>
+      <section className="overview-grid">
+        <article className="card">
+          <h2>Mission Objectives</h2>
           <ul>
             {motive.map((item) => (
               <li key={item}>{item}</li>
@@ -98,36 +120,34 @@ function Home() {
         </article>
 
         <article className="card">
-          <h2>Story Theme</h2>
+          <h2>System Personality</h2>
           <p>
-            You are a data detective. Each mission gives you suspect records, evidence tables,
-            and timeline logs. Your SQL queries reveal the truth.
+            This is not a playful UI. It behaves like an internal police intelligence console.
           </p>
           <p className="muted-text">
-            The better your query quality, the faster you unlock advanced chapters.
+            Access Restricted. Partial Data Retrieved. Suspicious Pattern Detected.
           </p>
         </article>
       </section>
 
-      <section className="grid">
-        <article className="card full-width">
-          <h2>Level Journey</h2>
-          <p className="muted-text">
-            Every level introduces new SQL topics, so your skills grow from basic commands to
-            pro-level problem solving.
-          </p>
-          <div className="levels">
-            {gameFlow.map((stage) => (
-              <div key={stage.level} className="level-item">
-                <h3>{stage.level}</h3>
-                <p>{stage.objective}</p>
-              </div>
-            ))}
-          </div>
-        </article>
+      <section className="card case-files">
+        <h2>Case Files // Main Motive by Level</h2>
+        <div className="case-grid">
+          {caseFiles.map(([id, title, topic, summary]) => (
+            <article className="case-card" key={id}>
+              <p className="case-id">Case File {id}</p>
+              <h3>{title}</h3>
+              <p className="case-topic">{topic}</p>
+              <p>{summary}</p>
+              <span className="status-chip">Evidence Route Active</span>
+            </article>
+          ))}
+        </div>
+      </section>
 
+      <section className="grid">
         <article className="card">
-          <h2>Basics of SQL</h2>
+          <h2>Core Query Skills</h2>
           <ul>
             {basics.map((item) => (
               <li key={item}>{item}</li>
@@ -136,7 +156,7 @@ function Home() {
         </article>
 
         <article className="card">
-          <h2>5 SQL Dialects</h2>
+          <h2>Investigation Stack</h2>
           <div className="dialects">
             {dialects.map((d) => (
               <div key={d.name} className="chip">
@@ -159,25 +179,30 @@ function Home() {
           </div>
         </article>
 
-        <article className="card">
-          <h2>ACID Properties</h2>
-          <div className="acid-list">
+        <article className="card full-width">
+          <h2>ACID Properties in Database</h2>
+          <p className="muted-text">
+            ACID ensures that database transactions are reliable and safe, even when something goes
+            wrong.
+          </p>
+          <div className="acid-grid">
             {acid.map((a) => (
-              <div key={a.key} className="acid-item">
-                <h3>{a.key}</h3>
-                <p>{a.text}</p>
-              </div>
+              <article key={a.key} className="acid-box">
+                <h3>
+                  {a.key} <span>({a.title})</span>
+                </h3>
+                <ul>
+                  {a.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+                <p className="acid-example">
+                  <strong>Example:</strong> {a.example}
+                </p>
+              </article>
             ))}
           </div>
-        </article>
-
-        <article className="card">
-          <h2>More SQL You Will Learn</h2>
-          <ul>
-            {extraSqlConcepts.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
+          <p className="acid-summary">In one line: ACID = Safe, Reliable, and Consistent database transactions.</p>
         </article>
       </section>
     </main>

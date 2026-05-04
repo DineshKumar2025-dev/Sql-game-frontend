@@ -58,11 +58,11 @@ function Levels() {
   return (
     <main className="levels-page">
       <section className="levels-hero">
-        <p className="levels-badge">Detective Progress Map</p>
-        <h1>Choose Your SQL Mission</h1>
+        <p className="levels-badge">Case Terminal // Investigation Grid</p>
+        <h1>Select a Confidential Case File</h1>
         <p>
-          Follow the roadmap from beginner to pro. Complete each level to unlock the next
-          mystery chapter.
+          Every query brings you closer to the truth... or deeper into the lie. Clear each case
+          file to unlock restricted evidence in the next one.
         </p>
       </section>
 
