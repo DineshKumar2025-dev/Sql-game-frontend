@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import emailjs from '@emailjs/browser'
 import './auth.css'
-
+const API_BASE = import.meta.env.VITE_API_URL 
 function Signup({ onSwitchToLogin, onSignupSuccess }) {
   const [form, setForm] = useState({
     fullName: '',
@@ -83,7 +83,7 @@ function Signup({ onSwitchToLogin, onSignupSuccess }) {
     setIsLoading(true)
     try {
       if (!otpSent) {
-        const response = await fetch('http://localhost:8000/api/auth/request-otp', {
+        const response = await fetch(`${API_BASE}/api/auth/request-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -104,7 +104,7 @@ function Signup({ onSwitchToLogin, onSignupSuccess }) {
         return
       }
 
-      const response = await fetch('http://localhost:8000/api/auth/signup', {
+      const response = await fetch(`${API_BASE}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
