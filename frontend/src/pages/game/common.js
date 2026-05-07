@@ -15,7 +15,7 @@ function getStoredUserId() {
 async function sub_level(level) {
     const levelNum = Number(level);
     const user_id = getStoredUserId();
-
+    console.log(user_id);
     const response = await fetch(
         `${API_BASE}/api/levels/level_sublevel?level=${encodeURIComponent(levelNum)}&user_id=${encodeURIComponent(user_id)}`,
         { method: 'GET' }
@@ -34,6 +34,7 @@ async function get_sql_query(level) {
     // Sublevel id string (e.g. l11) — must match verifycode / DB level_id, not a numeric row id.
     const levelKey = level == null ? '' : String(level).trim();
     const user_id = getStoredUserId();
+    console.log(user_id);
     const response = await fetch(
         `${API_BASE}/api/levels/sublevel_query?level=${encodeURIComponent(levelKey)}&user_id=${encodeURIComponent(user_id)}`,
         { method: 'GET' }
