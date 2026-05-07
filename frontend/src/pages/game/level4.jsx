@@ -136,6 +136,7 @@ function Level4() {
   )
 
   const [sqlInput, setSqlInput] = useState('')
+  const [isChecking, setIsChecking] = useState(false)
   useEffect(() => {
     if (!selected?.id) return
     get_sql_query(selected.id)
@@ -195,7 +196,9 @@ function Level4() {
       return
     }
 
+    if (isChecking) return
     try {
+      setIsChecking(true)
       setQueryOutput([])
       const response = await fetch(`${API_BASE}/api/verifycode`, {
         method: 'POST',
@@ -259,6 +262,8 @@ function Level4() {
       console.error('Error:', error)
       const reason = error instanceof Error ? error.message : String(error)
       setMessage(`Something went wrong: ${reason}`)
+    } finally {
+      setIsChecking(false)
     }
   }
 
@@ -366,8 +371,14 @@ function Level4() {
               value={sqlInput}
               onChange={(e) => setSqlInput(e.target.value)}
             />
-            <button type="button" className="check-btn my-2" onClick={handleCheckAnswer}>
-              Run Query Check
+            <button
+              type="button"
+              className={`check-btn my-2 ${isChecking ? 'is-loading' : ''}`}
+              onClick={handleCheckAnswer}
+              disabled={isChecking}
+            >
+              {isChecking ? <span className="btn-spinner" aria-hidden="true" /> : null}
+              {isChecking ? 'Executing…' : 'Run Query Check'}
             </button>
             {message && <p className="feedback">{message}</p>}
             {queryOutput.length > 0 && (

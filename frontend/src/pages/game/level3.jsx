@@ -165,6 +165,7 @@ function Level3() {
     [currentSublevel],
   )
   const [sqlInput, setSqlInput] = useState('')
+  const [isChecking, setIsChecking] = useState(false)
   useEffect(() => {
     if (!selected?.id) return
 
@@ -225,7 +226,9 @@ function Level3() {
       return
     }
 
+    if (isChecking) return
     try {
+      setIsChecking(true)
       setQueryOutput([])
       const response = await fetch(`${API_BASE}/api/verifycode`, {
         method: 'POST',
@@ -298,6 +301,8 @@ function Level3() {
           ? `Cannot reach API at ${API_BASE}. Start the backend (e.g. port 8000) and confirm VITE_API_URL in .env. (${reason})`
           : `Something went wrong: ${reason}`,
       )
+    } finally {
+      setIsChecking(false)
     }
   }
 
@@ -423,8 +428,14 @@ function Level3() {
               value={sqlInput}
               onChange={(e) => setSqlInput(e.target.value)}
             />
-            <button type="button" className="check-btn my-2" onClick={handleCheckAnswer}>
-              Run Query Check
+            <button
+              type="button"
+              className={`check-btn my-2 ${isChecking ? 'is-loading' : ''}`}
+              onClick={handleCheckAnswer}
+              disabled={isChecking}
+            >
+              {isChecking ? <span className="btn-spinner" aria-hidden="true" /> : null}
+              {isChecking ? 'Executing…' : 'Run Query Check'}
             </button>
             {message && <p className="feedback">{message}</p>}
             {queryOutput.length > 0 && (

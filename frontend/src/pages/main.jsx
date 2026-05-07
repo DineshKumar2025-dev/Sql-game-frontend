@@ -13,7 +13,7 @@ function Main() {
   }
 
   return (
-    <div>
+    <div className="app-shell">
       <Topbar
         activePage={activePage}
         onHome={() => navigate('/')}
