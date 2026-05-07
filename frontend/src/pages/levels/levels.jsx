@@ -50,7 +50,7 @@ function Levels() {
 
   const currentLevel = Number(level)
   const getStatus = (id) => {
-    if (id === currentLevel) return 'completed'
+    if (id <= currentLevel) return 'completed'
     if (id === currentLevel+1) return 'current'
     return 'locked'
   }
