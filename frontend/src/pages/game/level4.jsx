@@ -74,15 +74,7 @@ const accountsFields = ['id (PK)', 'holder', 'org', 'account_type', 'created_at'
 const transactionsFields = ['id (PK)', 'account_id (FK)', 'amount', 'category', 'date', 'flagged']
 
 function getStoredUserId() {
-  try {
-    const raw = localStorage.getItem('auth_user')
-    if (!raw) return null
-    const user = JSON.parse(raw)
-    const id = user?.user_id ?? user?.id
-    return id != null ? Number(id) : null
-  } catch {
-    return null
-  }
+  return localStorage.getItem('user_id');
 }
 
 async function readJsonResponse(response) {

@@ -27,15 +27,7 @@ const incidentsFields = ['id (PK)', 'citizen_id (FK)', 'type', 'district', 'seve
 const queryLogFields = ['id (PK)', 'query_text', 'exec_time_ms', 'ran_at', 'used_index']
 
 function getStoredUserId() {
-  try {
-    const raw = localStorage.getItem('auth_user')
-    if (!raw) return null
-    const user = JSON.parse(raw)
-    const id = user?.user_id ?? user?.id
-    return id != null ? Number(id) : null
-  } catch {
-    return null
-  }
+  return localStorage.getItem('user_id');
 }
 
 async function readJsonResponse(response) {

@@ -73,15 +73,7 @@ const evidenceFields = ['id (PK)', 'case_id', 'description', 'verified', 'plante
 const witnessesFields = ['id (PK)', 'name', 'testimony', 'credibility', 'protected']
 
 function getStoredUserId() {
-  try {
-    const raw = localStorage.getItem('auth_user')
-    if (!raw) return null
-    const user = JSON.parse(raw)
-    const id = user?.user_id ?? user?.id
-    return id != null ? Number(id) : null
-  } catch {
-    return null
-  }
+  return localStorage.getItem('user_id');
 }
 
 async function readJsonResponse(response) {

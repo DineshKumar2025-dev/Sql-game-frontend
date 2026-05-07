@@ -73,15 +73,7 @@ const agentsFields = ['id (PK)', 'codename', 'real_name', 'reports_to (FK)', 'sa
 const ordersFields = ['id (PK)', 'issued_by (FK)', 'target', 'operation', 'priority', 'date']
 
 function getStoredUserId() {
-  try {
-    const raw = localStorage.getItem('auth_user')
-    if (!raw) return null
-    const user = JSON.parse(raw)
-    const id = user?.user_id ?? user?.id
-    return id != null ? Number(id) : null
-  } catch {
-    return null
-  }
+  return localStorage.getItem('user_id');
 }
 
 async function readJsonResponse(response) {

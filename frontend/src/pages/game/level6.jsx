@@ -75,15 +75,7 @@ const keysFields = ['id (PK)', 'key_code', 'issued_to', 'valid', 'created_at']
 const sessionsFields = ['id (PK)', 'agent_id', 'node', 'action', 'file_id', 'timestamp']
 
 function getStoredUserId() {
-  try {
-    const raw = localStorage.getItem('auth_user')
-    if (!raw) return null
-    const user = JSON.parse(raw)
-    const id = user?.user_id ?? user?.id
-    return id != null ? Number(id) : null
-  } catch {
-    return null
-  }
+  return localStorage.getItem('user_id');
 }
 
 async function readJsonResponse(response) {
