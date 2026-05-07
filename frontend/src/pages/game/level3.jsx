@@ -87,8 +87,7 @@ const sublevels = [
 const CASE_COMPLETE = '__case_complete__'
 
 function initialMaxUnlocked() {
-  const chapter = Number(localStorage.getItem('level') ?? '1')
-  return !Number.isNaN(chapter) && chapter >= 4 ? CASE_COMPLETE : 'l31'
+  return sublevels[0]?.id ?? 'l31'
 }
 
 const suspectsFields = ['id (PK)', 'name', 'alias', 'org', 'threat_level']
@@ -107,7 +106,7 @@ const transactionsFields = [
 
 function getStoredUserId() {
   try {
-    const raw = localStorage.getItem('user')
+    const raw = localStorage.getItem('auth_user')
     if (!raw) return null
     const user = JSON.parse(raw)
     const id = user?.user_id ?? user?.id
@@ -281,12 +280,10 @@ function Level3() {
         }
 
         if (isFinal) {
-          const unlockedLevel = Number(localStorage.getItem('level') ?? '1')
-          localStorage.setItem(
-            'level',
-            String(Number.isNaN(unlockedLevel) ? 4 : Math.max(unlockedLevel, 4)),
-          )
+          const prev = Number(localStorage.getItem('highest_level_completed') ?? '0')
+          localStorage.setItem('highest_level_completed', String(Math.max(prev, 3)))
         }
+
         return
       }
 

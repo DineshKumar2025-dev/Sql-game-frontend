@@ -84,8 +84,7 @@ const sublevels = [
 const CASE_COMPLETE = '__case_complete__'
 
 function initialMaxUnlocked() {
-  const chapter = Number(localStorage.getItem('level') ?? '1')
-  return !Number.isNaN(chapter) && chapter >= 3 ? CASE_COMPLETE : 'l21'
+  return sublevels[0]?.id ?? 'l21'
 }
 
 const dronesFields = ['id (PK)', 'drone_code', 'owner_org', 'status', 'floor_base']
@@ -104,7 +103,7 @@ const transmissionsFields = [
 
 function getStoredUserId() {
   try {
-    const raw = localStorage.getItem('user')
+    const raw = localStorage.getItem('auth_user')
     if (!raw) return null
     const user = JSON.parse(raw)
     const id = user?.user_id ?? user?.id
@@ -278,12 +277,10 @@ function Level2() {
         }
 
         if (isFinal) {
-          const unlockedLevel = Number(localStorage.getItem('level') ?? '1')
-          localStorage.setItem(
-            'level',
-            String(Number.isNaN(unlockedLevel) ? 3 : Math.max(unlockedLevel, 3)),
-          )
+          const prev = Number(localStorage.getItem('highest_level_completed') ?? '0')
+          localStorage.setItem('highest_level_completed', String(Math.max(prev, 2)))
         }
+
         return
       }
 

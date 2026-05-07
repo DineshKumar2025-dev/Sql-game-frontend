@@ -8,7 +8,14 @@ function Main() {
   const activePage = location.pathname.startsWith('/levels') ? 'levels' : 'home'
 
   const handleLogout = () => {
-    localStorage.removeItem('login_status')
+    const keysToClear = [
+      'login_status',
+      'auth_token',
+      'auth_user',
+      'highest_level_completed',
+    ]
+    keysToClear.forEach((key) => localStorage.removeItem(key))
+    sessionStorage.clear()
     window.location.reload()
   }
 

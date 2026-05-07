@@ -36,8 +36,7 @@ function Login({ onSwitchToSignup, onLoginSuccess }) {
 
       localStorage.setItem('login_status', 'true')
       localStorage.setItem('auth_token', data.token ?? '')
-      localStorage.setItem('user', JSON.stringify(data.user ?? {}))      
-      localStorage.setItem('user_id', data.user.user_id);
+      localStorage.setItem('auth_user', JSON.stringify(data.user ?? {}))
       localStorage.setItem('highest_level_completed', data.user.highest_level_completed)
       onLoginSuccess?.()
     } catch (submitError) {

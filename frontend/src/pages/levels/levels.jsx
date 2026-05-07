@@ -3,16 +3,22 @@ import { useState, useEffect } from 'react'
 import Playmap from '../playmap'
 
 const API_BASE = import.meta.env.VITE_API_URL 
-const highest_level_completed = Number(localStorage.getItem('highest_level_completed')) || 0;
 function Levels() {
-  const [level] = useState(highest_level_completed)
-
-  useEffect(() => {
-    localStorage.setItem('level', String(level))
-  }, [level])
-
+  const [level, setLevel] = useState(
+    () => Number(localStorage.getItem('highest_level_completed')) || 0,
+  )
   const [levels, setLevels] = useState([])
   const [loadError, setLoadError] = useState(null)
+
+  useEffect(() => {
+    const onStorage = (event) => {
+      if (event.key === 'highest_level_completed') {
+        setLevel(Number(event.newValue) || 0)
+      }
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
 
   useEffect(() => {
     let cancelled = false

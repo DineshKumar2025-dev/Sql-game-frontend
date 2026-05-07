@@ -18,8 +18,7 @@ const sublevels = [
 const CASE_COMPLETE = '__case_complete__'
 
 function initialMaxUnlocked() {
-  const chapter = Number(localStorage.getItem('level') ?? '1')
-  return !Number.isNaN(chapter) && chapter >= 11 ? CASE_COMPLETE : 'l81'
+  return sublevels[0]?.id ?? 'l81'
 }
 
 const ledgerFields = ['id (PK)', 'account_from', 'account_to', 'amount', 'status', 'timestamp', 'tx_group']
@@ -27,7 +26,7 @@ const balancesFields = ['id (PK)', 'account (UNIQUE)', 'balance', 'last_updated'
 
 function getStoredUserId() {
   try {
-    const raw = localStorage.getItem('user')
+    const raw = localStorage.getItem('auth_user')
     if (!raw) return null
     const user = JSON.parse(raw)
     const id = user?.user_id ?? user?.id
@@ -183,13 +182,12 @@ function Level8() {
             if (nextIdx > maxIdx) setMaxUnlocked(nextId)
           }
         }
+
         if (isFinal) {
-          const unlockedLevel = Number(localStorage.getItem('level') ?? '1')
-          localStorage.setItem(
-            'level',
-            String(Number.isNaN(unlockedLevel) ? 9 : Math.max(unlockedLevel, 9)),
-          )
+          const prev = Number(localStorage.getItem('highest_level_completed') ?? '0')
+          localStorage.setItem('highest_level_completed', String(Math.max(prev, 8)))
         }
+
         return
       }
 
