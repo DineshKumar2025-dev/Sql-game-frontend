@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './game.css'
 import DraggableNode from './DraggableNode'
+import SchemaZoomControls from './SchemaZoomControls'
 import sub_level, { get_sql_query } from './common'
 
 const API_BASE = import.meta.env.VITE_API_URL
@@ -211,7 +212,9 @@ function Level8() {
       </section>
 
       <section className="schema-board-wrap">
+        <SchemaZoomControls boardRef={schemaBoardRef} />
         <div className="schema-board" ref={schemaBoardRef}>
+          <div className="schema-board-canvas">
           <DraggableNode
             id="ledger"
             title="ledger"
@@ -232,6 +235,7 @@ function Level8() {
             boardRef={schemaBoardRef}
             onPositionChange={updateTablePosition}
           />
+          </div>
         </div>
       </section>
 

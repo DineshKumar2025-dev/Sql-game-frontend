@@ -16,6 +16,10 @@
   margin: 0 auto 16px;
 }
 
+.schema-board-wrap {
+  position: relative;
+}
+
 .level-hero,
 .challenge-panel,
 .skills-covered {
@@ -52,13 +56,53 @@
 }
 
 .schema-board {
+  --schema-zoom: 1;
   position: relative;
   min-height: 360px;
   border-radius: 16px;
-  padding: 12px;
+  padding: 52px 12px 12px;
   background: rgba(6, 14, 26, 0.94);
   border: 1px solid rgba(56, 189, 248, 0.2);
-  overflow: hidden;
+  overflow: auto;
+}
+
+.schema-board-canvas {
+  position: relative;
+  min-height: 360px;
+  width: calc(100% / var(--schema-zoom));
+  transform: scale(var(--schema-zoom));
+  transform-origin: top left;
+}
+
+.schema-zoom-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 4;
+}
+
+.schema-zoom-btn {
+  border: 1px solid rgba(125, 211, 252, 0.4);
+  background: rgba(15, 23, 42, 0.85);
+  color: #bae6fd;
+  border-radius: 7px;
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.schema-zoom-btn:hover {
+  border-color: rgba(34, 211, 238, 0.7);
+}
+
+.schema-zoom-reset {
+  min-width: 54px;
 }
 
 .schema-links {
@@ -84,11 +128,12 @@
 
 .db-table-node {
   position: absolute;
-  width: 300px;
+  width: min(300px, calc(100% - 16px));
   min-height: 190px;
   border-radius: 14px;
-  padding: 12px;
-  background: rgba(10, 20, 35, 0.96);
+  padding: 12px 12px 10px;
+  background:
+    linear-gradient(165deg, rgba(10, 20, 35, 0.98) 0%, rgba(8, 16, 30, 0.92) 100%);
   border: 1px solid rgba(34, 211, 238, 0.3);
   color: #dbeafe;
   box-sizing: border-box;
@@ -97,22 +142,106 @@
   touch-action: none;
   transition: box-shadow 150ms ease, border-color 150ms ease;
   z-index: 2;
+  transform-origin: top left;
+}
+
+.db-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  cursor: grab;
+}
+
+.db-table-header:active {
+  cursor: grabbing;
 }
 
 .db-table-node h3 {
-  margin: 0 0 8px;
+  margin: 0;
   color: #99f6e4;
   font-size: 1rem;
   font-family: 'Consolas', 'Courier New', monospace;
   text-transform: uppercase;
 }
 
+.db-table-chip {
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #cffafe;
+  background: rgba(8, 145, 178, 0.35);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+}
+
+.db-table-subtitle {
+  margin: 6px 0 10px;
+  color: #7dd3fc;
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: 'Consolas', 'Courier New', monospace;
+}
+
 .db-table-node ul {
   margin: 0;
-  padding-left: 18px;
+  padding-left: 0;
+  list-style: none;
   color: #bfdbfe;
   display: grid;
   gap: 4px;
+}
+
+.db-field-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 7px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(34, 211, 238, 0.12);
+}
+
+.db-field-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.db-field-tag {
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.db-field-tag-pk {
+  color: #cffafe;
+  background: rgba(8, 145, 178, 0.35);
+  border: 1px solid rgba(34, 211, 238, 0.35);
+}
+
+.db-field-tag-fk {
+  color: #ddd6fe;
+  background: rgba(109, 40, 217, 0.28);
+  border: 1px solid rgba(167, 139, 250, 0.4);
+}
+
+.db-drag-hint {
+  margin: 8px 0 0;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  text-align: right;
+  letter-spacing: 0.03em;
+}
+
+.db-drag-hint.is-active {
+  color: #67e8f9;
 }
 
 .db-table-node.is-dragging {
