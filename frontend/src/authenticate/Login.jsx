@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './auth.css'
 const API_BASE = import.meta.env.VITE_API_URL 
-function Login({ onSwitchToSignup, onLoginSuccess }) {
+function Login({ onSwitchToSignup, onSwitchToForgotPassword, onLoginSuccess }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
@@ -94,7 +94,11 @@ function Login({ onSwitchToSignup, onLoginSuccess }) {
               />
               Remember me
             </label>
-            <button type="button" className="text-btn">
+            <button
+              type="button"
+              className="text-btn"
+              onClick={onSwitchToForgotPassword}
+            >
               Forgot password?
             </button>
           </div>

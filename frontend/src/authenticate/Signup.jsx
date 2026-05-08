@@ -65,6 +65,7 @@ function Signup({ onSwitchToLogin, onSignupSuccess }) {
         to_email: receiverEmail,
         otp: otpCode,
         name: receiverName,
+        subject: 'Account creation request',
       },
       {
         publicKey,

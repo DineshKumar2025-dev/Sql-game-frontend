@@ -2,21 +2,38 @@ import { useState } from 'react'
 import './auth.css'
 import Login from './Login.jsx'
 import Signup from './Signup.jsx'
+import ForgotPassword from './ForgotPassword.jsx'
+
+const VIEWS = {
+  SIGNUP: 'signup',
+  LOGIN: 'login',
+  FORGOT: 'forgot',
+}
 
 function Authanticate({ onLoginSuccess }) {
-  const [isLoginPage, setIsLoginPage] = useState(false)
+  const [view, setView] = useState(VIEWS.SIGNUP)
 
   return (
     <div className="auth-container">
-      {isLoginPage ? (
+      {view === VIEWS.LOGIN && (
         <Login
-          onSwitchToSignup={() => setIsLoginPage(false)}
+          onSwitchToSignup={() => setView(VIEWS.SIGNUP)}
+          onSwitchToForgotPassword={() => setView(VIEWS.FORGOT)}
           onLoginSuccess={onLoginSuccess}
         />
-      ) : (
+      )}
+
+      {view === VIEWS.SIGNUP && (
         <Signup
-          onSwitchToLogin={() => setIsLoginPage(true)}
+          onSwitchToLogin={() => setView(VIEWS.LOGIN)}
           onSignupSuccess={onLoginSuccess}
+        />
+      )}
+
+      {view === VIEWS.FORGOT && (
+        <ForgotPassword
+          onSwitchToLogin={() => setView(VIEWS.LOGIN)}
+          onResetSuccess={() => setView(VIEWS.LOGIN)}
         />
       )}
     </div>
